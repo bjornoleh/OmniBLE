@@ -389,6 +389,7 @@ extension OmnipodPumpManager {
 
     // Does not support concurrent callers. Not thread-safe.
     private func forgetPod(completion: @escaping () -> Void) {
+        omnipod.disconnect()
         let resetPodState = { (_ state: inout OmnipodPumpManagerState) in
             self.podComms = PodComms(podState: nil, lotNo: nil, lotSeq: nil)
             self.podComms.delegate = self
@@ -1169,7 +1170,7 @@ extension OmnipodPumpManager: PumpManager {
         }
     }
 
-    public func enactBolus(units: Double, at startDate: Date, willRequest: @escaping (DoseEntry) -> Void, completion: @escaping (PumpManagerResult<DoseEntry>) -> Void) {
+    public func enactBolus(units: Double, at startDate: Date, automatic: Bool, willRequest: @escaping (DoseEntry) -> Void, completion: @escaping (PumpManagerResult<DoseEntry>) -> Void) {
         guard self.hasActivePod else {
             completion(.failure(SetBolusError.certain(OmnipodPumpManagerError.noPodPaired)))
             return
